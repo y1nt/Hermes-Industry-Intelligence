@@ -1,6 +1,12 @@
-# 📡 Hermes Industry Intelligence
+# 📡 Industry News Monitor
 
-> A daily industry intelligence skill for Hermes Agent. Automatically collect, summarize, deduplicate, and deliver company and industry news reports.
+[English](#english) | [中文](#中文)
+
+---
+
+# English
+
+> Automatically collect, organize, and deliver daily news about selected industries and companies. Chinese-only reports, automatic deduplication, and ready to use out of the box.
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
@@ -8,37 +14,18 @@
 
 ---
 
-## Overview
-
-Hermes Industry Intelligence turns Hermes Agent into a personal industry news assistant.
-
-It automatically monitors selected companies and industries, collects the latest news from Google News RSS, removes duplicates, categorizes events, generates concise summaries, and delivers daily reports through Hermes cron.
-
-Features:
-
-- 📰 Automated daily industry news monitoring
-- 🏢 Multi-company and multi-industry tracking
-- 🇨🇳 Chinese summary generation
-- 🔄 Automatic duplicate removal
-- 📂 Smart company/topic classification
-- ⏰ Scheduled delivery with Hermes cron
-- 🔌 No API keys required
-- 🪶 Zero third-party Python dependencies
-
----
-
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| ✅ Multi-company monitoring | Track multiple companies and industries simultaneously |
-| ✅ Chinese output | Convert original headlines into Chinese summaries |
-| ✅ Deduplication | Remove duplicate headlines and repeated daily news |
-| ✅ Smart classification | Group news by company or topic |
-| ✅ Free data source | Uses Google News RSS without API keys |
-| ✅ Lightweight | Pure Python standard library implementation |
-| ✅ Scheduled reports | Works with Hermes cron automation |
-| ✅ Multi-platform delivery | Supports Telegram, Discord, Slack, and more |
+| Feature                         | Description                                                                                 |
+| ------------------------------- | ------------------------------------------------------------------------------------------- |
+| ✅ Multi-company monitoring      | Track multiple companies and industry keywords simultaneously                               |
+| ✅ Chinese-only output           | Convert original headlines into Chinese summaries of 100–250 Chinese characters per article |
+| ✅ Automatic deduplication       | Deduplicate headlines and prevent the same news from being delivered across multiple days   |
+| ✅ Smart classification          | Automatically group news by company or topic                                                |
+| ✅ No API key required           | Uses Google News RSS as a free data source                                                  |
+| ✅ Zero third-party dependencies | Built entirely with the Python standard library                                             |
+| ✅ Scheduled delivery            | Works with Hermes cron for automatic delivery                                               |
+| ✅ Multi-platform support        | Supports Telegram, Discord, Slack, and more                                                 |
 
 ---
 
@@ -46,11 +33,240 @@ Features:
 
 ### Installation
 
-Copy the scripts into your Hermes scripts directory:
-
 ```bash
+# 1. Copy the scripts to your Hermes directory
 cp scripts/storage_news.py ~/.hermes/scripts/
 cp scripts/storage_news.sh ~/.hermes/scripts/
+
+# 2. Run a test
+python3 ~/.hermes/scripts/storage_news.py
+```
+
+### Configuration
+
+Edit `~/.hermes/scripts/storage_news.py` and modify the `QUERIES` array:
+
+```python
+# Format: (display label, Google News search query)
+QUERIES = [
+    ("Tesla", "Tesla EV news quarterly report 2026"),
+    ("BYD", "BYD electric vehicle expansion 2026"),
+    ("Industry Updates", "EV battery electric vehicle market forecast 2026"),
+]
+```
+
+### Schedule the Task
+
+```bash
+# Deliver every day at 9:00 AM
+hermes cron create \
+  --name "Industry News Monitor" \
+  --schedule "0 9 * * *" \
+  --script storage_news.sh \
+  --no-agent \
+  --workdir /home/agentuser
+```
+
+> If the server uses UTC, change `0 9 * * *` to `0 1 * * *` for delivery at 9:00 AM China Standard Time.
+
+---
+
+## Example Output
+
+```text
+📡 **Daily Memory Chip News**
+
+📅 **Date:** July 28, 2026
+⏰ **Collection Time:** 09:05 CST
+📊 **Time Range:** Last 7 days
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+**💾 SK Hynix**
+
+🆕 **SK Hynix Share Price Falls Sharply**
+   【Key Data】The share price fell by 15%. SK Hynix shares have experienced a notable correction. Investors are becoming more cautious amid concerns over changing supply and demand conditions in the memory industry, macroeconomic uncertainty, and geopolitical risks. However, several institutions believe the long-term trend of AI-driven memory demand remains unchanged and that the correction may create new investment opportunities. (CNBC)
+
+🆕 **SK Hynix Expands Production Investment**
+   SK Hynix announced a new production expansion plan. To meet rapidly increasing memory demand in the AI era, the company is raising capital expenditure, building advanced production lines, and expanding capacity for high-end products such as HBM. The scale of the investment reflects strong confidence in memory demand growth over the next several years. (TrendForce)
+
+**💾 Micron**
+
+🆕 **Micron and Geopolitical Competition**
+   Geopolitical factors are having a significant impact on the structure of the memory chip industry. As technology competition between China and the United States intensifies, export controls, tariff policies, and supply-chain security have become major concerns. (WSJ)
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+📊 **Statistics**
+- Originally collected: 72 articles → 66 after deduplication
+- Displayed: 35 articles, including 20 new articles
+- Next update: Tomorrow at 09:00 CST
+```
+
+---
+
+## Project Structure
+
+```text
+industry-news-monitor/
+├── README.md                    ← This document
+├── SKILL.md                     ← Hermes Skill documentation
+├── scripts/
+│   ├── storage_news.py          ← Core news collection engine
+│   └── storage_news.sh          ← Cron wrapper
+└── references/
+    └── deployment-guide.md      ← Deployment guide with multi-industry examples
+```
+
+---
+
+## Customization Guide
+
+### Change Monitored Companies and Keywords
+
+Edit the `QUERIES` array:
+
+| Technique        | Example                                                |
+| ---------------- | ------------------------------------------------------ |
+| Exact search     | `"SK hynix"`                                           |
+| Combined search  | `"SK hynix" AND "HBM4"`                                |
+| Exclude keywords | `"CXMT" -IPO`                                          |
+| Year hint        | Add `2026` to prioritize results from the current year |
+
+### Change Classification Rules
+
+Edit the `classify()` function:
+
+```python
+def classify(item):
+    t = item["title"].lower() + " " + item.get("desc", "").lower()
+    if "cxmt" in t: return "🇨🇳 CXMT"
+    if "hynix" in t: return "💾 SK Hynix"
+    if "micron" in t: return "💾 Micron"
+    # Add your own categories...
+```
+
+### Change Chinese Summaries
+
+Edit `template_map` inside `make_cn_report()`:
+
+```python
+template_map = {
+    "股价大跌": "{company}股价近期出现明显回调。市场担忧...",
+    "股价上涨": "{company}股价近期表现强劲。受益于...",
+}
+```
+
+### Change the Delivery Platform
+
+```bash
+hermes cron create --deliver "telegram"   # Deliver to Telegram
+hermes cron create --deliver "all"        # Deliver to all platforms
+hermes cron create --deliver "local"      # Save locally only
+```
+
+### Change the Time Range
+
+Modify `MAX_AGE_DAYS`, which defaults to 7:
+
+```python
+MAX_AGE_DAYS = 2  # Only include news from the last 2 days
+```
+
+---
+
+## Adapting It to Different Industries
+
+### 🔋 Electric Vehicles
+
+```python
+QUERIES = [
+    ("Tesla", "Tesla EV news quarterly report 2026"),
+    ("BYD", "BYD electric vehicle expansion 2026"),
+    ("NIO", "NIO EV delivery quarterly 2026"),
+    ("Industry Updates", "EV battery electric vehicle market forecast 2026"),
+]
+```
+
+### 🧠 AI Chips
+
+```python
+QUERIES = [
+    ("NVIDIA", "NVIDIA AI GPU data center earnings 2026"),
+    ("AMD", "AMD AI chip MI400 Instinct 2026"),
+    ("Industry Updates", "AI chip semiconductor forecast analyst 2026"),
+]
+```
+
+### ₿ Cryptocurrency
+
+```python
+QUERIES = [
+    ("Bitcoin", "Bitcoin ETF price regulation institutional 2026"),
+    ("Ethereum", "Ethereum ETF staking upgrade 2026"),
+    ("Regulation", "crypto regulation SEC policy global 2026"),
+]
+```
+
+---
+
+## How It Works
+
+```text
+Google News RSS (free)
+    ↓
+XML parsing → title / link / date / description
+    ↓
+Time filtering (last 7 days) + headline deduplication
+    ↓
+Event detection (IPO / surge / decline / expansion / partnership ...)
+    ↓
+Company detection using title and description keywords
+    ↓
+Number extraction (price changes / monetary amounts)
+    ↓
+Chinese summary generation using templates and key data
+    ↓
+Grouping by company → Chinese-only report
+```
+
+---
+
+## FAQ
+
+**Q: Why does RSS return no results?**
+A: Google News RSS may be blocked in some regions. You can use Bing News RSS or NewsAPI.org instead. The free NewsAPI plan allows 16 requests per day, which is sufficient for this use case.
+
+**Q: Why do the summaries sound too templated?**
+A: The script prioritizes Chinese descriptions from the RSS feed when available. You can also expand the content of `template_map`.
+
+**Q: What should I do if too many articles are delivered every day?**
+A: Reduce `MAX_AGE_DAYS`, use fewer keywords, or lower the maximum number of articles displayed in each group.
+
+**Q: How do I stop scheduled delivery?**
+
+```bash
+hermes cron list        # View task IDs
+hermes cron remove ID   # Remove a task
+```
+
+---
+
+## Requirements
+
+* Python 3.8+ using the standard library
+* Hermes Agent for cron scheduling and delivery
+* An internet connection with access to Google News RSS
+
+---
+
+## License
+
+MIT
+
+---
+
+# 中文
 
 # 📡 Industry News Monitor 行业新闻监控
 
@@ -64,16 +280,16 @@ cp scripts/storage_news.sh ~/.hermes/scripts/
 
 ## 功能特性
 
-| 特性 | 说明 |
-|------|------|
-| ✅ 多公司监控 | 同时跟踪多个公司/行业关键词 |
-| ✅ 纯中文输出 | 原标题 → 中文摘要（100-250字/条） |
-| ✅ 自动去重 | 标题去重 + 跨天去重，不重复推送 |
-| ✅ 智能分类 | 按公司/主题自动分组 |
+| 特性           | 说明                       |
+| ------------ | ------------------------ |
+| ✅ 多公司监控      | 同时跟踪多个公司/行业关键词           |
+| ✅ 纯中文输出      | 原标题 → 中文摘要（100-250字/条）   |
+| ✅ 自动去重       | 标题去重 + 跨天去重，不重复推送        |
+| ✅ 智能分类       | 按公司/主题自动分组               |
 | ✅ 无需 API Key | 使用 Google News RSS 免费数据源 |
-| ✅ 0 第三方依赖 | 纯 Python 标准库 |
-| ✅ 定时推送 | 配合 Hermes cron 自动投递 |
-| ✅ 多平台支持 | Telegram、Discord、Slack 等 |
+| ✅ 0 第三方依赖    | 纯 Python 标准库             |
+| ✅ 定时推送       | 配合 Hermes cron 自动投递      |
+| ✅ 多平台支持      | Telegram、Discord、Slack 等 |
 
 ---
 
@@ -174,12 +390,12 @@ industry-news-monitor/
 
 编辑 `QUERIES` 数组：
 
-| 技巧 | 示例 |
-|------|------|
-| 精确搜索 | `"SK hynix"` |
-| 组合搜索 | `"SK hynix" AND "HBM4"` |
-| 排除关键词 | `"CXMT" -IPO` |
-| 年份提示 | 末尾加 `2026` 优先返回当年结果 |
+| 技巧    | 示例                      |
+| ----- | ----------------------- |
+| 精确搜索  | `"SK hynix"`            |
+| 组合搜索  | `"SK hynix" AND "HBM4"` |
+| 排除关键词 | `"CXMT" -IPO`           |
+| 年份提示  | 末尾加 `2026` 优先返回当年结果     |
 
 ### 修改分类规则
 
@@ -292,6 +508,7 @@ A: 脚本优先使用 RSS 中的中文描述（如果有）。可以丰富 `temp
 A: 减小 `MAX_AGE_DAYS`、减少关键词数量、或降低每组的最大条数。
 
 **Q: 如何停止推送？**
+
 ```bash
 hermes cron list        # 查看任务 ID
 hermes cron remove ID   # 删除任务
@@ -301,9 +518,9 @@ hermes cron remove ID   # 删除任务
 
 ## 依赖
 
-- Python 3.8+（标准库，零第三方依赖）
-- Hermes Agent（用于 cron 调度和推送）
-- 网络连接（访问 Google News RSS）
+* Python 3.8+（标准库，零第三方依赖）
+* Hermes Agent（用于 cron 调度和推送）
+* 网络连接（访问 Google News RSS）
 
 ---
 
