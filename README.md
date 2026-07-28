@@ -1,3 +1,57 @@
+# 📡 Hermes Industry Intelligence
+
+> A daily industry intelligence skill for Hermes Agent. Automatically collect, summarize, deduplicate, and deliver company and industry news reports.
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Hermes Skill](https://img.shields.io/badge/Hermes-Skill-orange)](https://hermes-agent.nousresearch.com/)
+
+---
+
+## Overview
+
+Hermes Industry Intelligence turns Hermes Agent into a personal industry news assistant.
+
+It automatically monitors selected companies and industries, collects the latest news from Google News RSS, removes duplicates, categorizes events, generates concise summaries, and delivers daily reports through Hermes cron.
+
+Features:
+
+- 📰 Automated daily industry news monitoring
+- 🏢 Multi-company and multi-industry tracking
+- 🇨🇳 Chinese summary generation
+- 🔄 Automatic duplicate removal
+- 📂 Smart company/topic classification
+- ⏰ Scheduled delivery with Hermes cron
+- 🔌 No API keys required
+- 🪶 Zero third-party Python dependencies
+
+---
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| ✅ Multi-company monitoring | Track multiple companies and industries simultaneously |
+| ✅ Chinese output | Convert original headlines into Chinese summaries |
+| ✅ Deduplication | Remove duplicate headlines and repeated daily news |
+| ✅ Smart classification | Group news by company or topic |
+| ✅ Free data source | Uses Google News RSS without API keys |
+| ✅ Lightweight | Pure Python standard library implementation |
+| ✅ Scheduled reports | Works with Hermes cron automation |
+| ✅ Multi-platform delivery | Supports Telegram, Discord, Slack, and more |
+
+---
+
+## Quick Start
+
+### Installation
+
+Copy the scripts into your Hermes scripts directory:
+
+```bash
+cp scripts/storage_news.py ~/.hermes/scripts/
+cp scripts/storage_news.sh ~/.hermes/scripts/
+
 # 📡 Industry News Monitor 行业新闻监控
 
 > 每日自动采集、整理、推送特定行业/公司的新闻。纯中文输出，自动去重，开箱即用。
